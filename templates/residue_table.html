@@ -2,7 +2,19 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Tabelle {{ rows }}x{{ cols }}</title>
+    <title>Restklasse {{ moduli }}</title>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,15 +60,47 @@
     </style>
 </head>
 <body>
-<h1>Tabelle mit {{ rows }} Zeilen und {{ cols }} Spalten</h1>
-
+<h1>$\mathbb{Z}_{ {{ moduli }} }$</h1>
 <div class="info">
-    <strong>Dimensionen:</strong> {{ rows }} × {{ cols }} = {{ rows * cols }} Zellen
+    {% if is_prime %}
+    <p>{{ moduli }} is a prime number</p>
+    {% else %}
+    <p>{{ moduli }} is not a prime number</p>
+    {% endif %}
+
+    <p>
+    Primes in {{ moduli }} :
+    {% for (i, n) in primes.iter().enumerate() %}
+    {{ n }}{% if i + 1 < primes.len() %}, {% endif %}
+    {% endfor %}
+    </p>
 </div>
 
-<div class="info">
-    Multiplikationstabelle
-</div>
+<h3>Additionstabelle</h3>
+<table>
+    <thead>
+    <tr>
+        <th>mod {{ moduli }}</th>
+        {% for col in 0..=moduli-1 %}
+        <th>[{{ col }}]</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in 0..=moduli-1 %}
+    <tr>
+        <th>[{{ row }}]</th>
+        {% for col in 0..=moduli-1 %}
+        <td data-col="{{ col + 1 }}">{{ addition[row][col] }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+
+<h3>Multiplikationstabelle</h3>
 <table>
     <thead>
     <tr>
@@ -71,7 +115,7 @@
         <tr>
             <th>[{{ row }}]</th>
             {% for col in 0..=moduli-1 %}
-            <td data-col="{{ col + 1 }}">{{ data[row][col] }}</td>
+            <td data-col="{{ col + 1 }}">{{ multiplication[row][col] }}</td>
             {% endfor %}
         </tr>
         {% endfor %}

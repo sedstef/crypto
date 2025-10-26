@@ -46,9 +46,10 @@ struct SearchQuery {
 #[template(path = "residue_table.html")]
 struct ResidueTableTemplate {
     moduli: usize,
-    rows: usize,
-    cols: usize,
-    data: Vec<Vec<usize>>,
+    is_prime: bool,
+    primes: Vec<usize>,
+    addition: Vec<Vec<usize>>,
+    multiplication: Vec<Vec<usize>>,
 }
 
 // Template für Tabelle
@@ -144,25 +145,40 @@ async fn create_table(Query(params): Query<TableQuery>) -> Html<String> {
 
 // Handler for residue class
 async fn residue_class(Path(m): Path<usize>) -> Html<String> {
-    let moduli = m.min(200);
+    let moduli = m;
+    let prime = is_prime(moduli);
+    let mut primes = Vec::new();
+    for number in 0..=moduli {
+        if is_prime(number){
+            primes.push(number as usize);
+        }
+    }
+
+    let addition = fill_table(moduli, |row, col| row + col);
+    let multiplication = fill_table(moduli, |row, col| row * col);
+
+    let template = ResidueTableTemplate {
+        moduli: moduli,
+        is_prime: prime,
+        primes: primes,
+        addition,
+        multiplication,
+    };
+    Html(template.render().unwrap())
+}
+
+fn fill_table(moduli: usize, function: fn(usize,usize) -> usize) -> Vec<Vec<usize>> {
     let mut data = Vec::new();
 
     for row in 0..=moduli {
         let mut row_data = Vec::new();
         for col in 0..=moduli {
-            let value = (row * col).rem_euclid(moduli);
-            row_data.push( value);
+            let value = function(row, col).rem_euclid(moduli);
+            row_data.push(value);
         }
         data.push(row_data);
     }
-
-    let template = ResidueTableTemplate {
-        moduli: moduli,
-        rows: moduli,
-        cols: moduli,
-        data,
-    };
-    Html(template.render().unwrap())
+    data
 }
 
 async fn multiplication_table(Path(size): Path<usize>) -> Html<String> {
@@ -185,6 +201,21 @@ async fn multiplication_table(Path(size): Path<usize>) -> Html<String> {
     Html(template.render().unwrap())
 }
 
+// Define a function named 'is_prime' that takes a number as parameter and returns true if it's prime, false otherwise
+fn is_prime(num: usize) -> bool {
+    if num <= 1 {
+        return false; // Numbers less than or equal to 1 are not prime
+    }
+
+    // Check if num is divisible by any number from 2 to the square root of num
+    for i in 2..=(num as f64).sqrt() as usize {
+        if num % i == 0 {
+            return false; // If num is divisible by any number other than 1 and itself, it's not prime
+        }
+    }
+
+    true // If num is not divisible by any number other than 1 and itself, it's prime
+}
 
 #[tokio::main]
 async fn main() {
