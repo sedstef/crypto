@@ -42,6 +42,15 @@ struct SearchQuery {
     q: Option<String>,
 }
 
+#[derive(Template)]
+#[template(path = "residue_table.html")]
+struct ResidueTableTemplate {
+    moduli: usize,
+    rows: usize,
+    cols: usize,
+    data: Vec<Vec<usize>>,
+}
+
 // Template für Tabelle
 #[derive(Template)]
 #[template(path = "table.html")]
@@ -133,7 +142,29 @@ async fn create_table(Query(params): Query<TableQuery>) -> Html<String> {
     Html(template.render().unwrap())
 }
 
-// Handler for multiplication table
+// Handler for residue class
+async fn residue_class(Path(m): Path<usize>) -> Html<String> {
+    let moduli = m.min(200);
+    let mut data = Vec::new();
+
+    for row in 0..=moduli {
+        let mut row_data = Vec::new();
+        for col in 0..=moduli {
+            let value = (row * col).rem_euclid(moduli);
+            row_data.push( value);
+        }
+        data.push(row_data);
+    }
+
+    let template = ResidueTableTemplate {
+        moduli: moduli,
+        rows: moduli,
+        cols: moduli,
+        data,
+    };
+    Html(template.render().unwrap())
+}
+
 async fn multiplication_table(Path(size): Path<usize>) -> Html<String> {
     let size = size.min(20);
     let mut data = Vec::new();
@@ -161,6 +192,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(index))
         .route("/table", get(create_table))
+        .route("/residue_class/:size", get(residue_class))
         .route("/multiplication/:size", get(multiplication_table))
         .route("/detail/:id", get(detail))
         .route("/search", get(search))
