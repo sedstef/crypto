@@ -38,6 +38,17 @@ struct FactorizationTemplate {
 }
 
 #[derive(Template)]
+#[template(path = "residue_table.html")]
+struct ResidueTableTemplate {
+    moduli: usize,
+    is_prime: bool,
+    primes: Vec<usize>,
+    addition: Vec<Vec<usize>>,
+    multiplication: Vec<Vec<usize>>,
+}
+
+
+#[derive(Template)]
 #[template(path = "detail.html")]
 struct DetailTemplate {
     id: u32,
@@ -63,15 +74,6 @@ struct SearchQuery {
     q: Option<String>,
 }
 
-#[derive(Template)]
-#[template(path = "residue_table.html")]
-struct ResidueTableTemplate {
-    moduli: usize,
-    is_prime: bool,
-    primes: Vec<usize>,
-    addition: Vec<Vec<usize>>,
-    multiplication: Vec<Vec<usize>>,
-}
 
 // Handler
 async fn index() -> Html<String> {
@@ -105,6 +107,24 @@ async fn integer_factorization(Path(number): Path<usize>) -> Html<String> {
     };
     Html(template.render().unwrap())
 }
+
+async fn residue_class(Path(moduli): Path<usize>) -> Html<String> {
+    let prime = math::is_prime(moduli);
+    let primes = math::get_primes(moduli);
+
+    let addition = math::remainder_table(moduli, |row, col| row + col);
+    let multiplication = math::remainder_table(moduli, |row, col| row * col);
+
+    let template = ResidueTableTemplate {
+        moduli: moduli,
+        is_prime: prime,
+        primes: primes,
+        addition,
+        multiplication,
+    };
+    Html(template.render().unwrap())
+}
+
 
 
 async fn detail(Path(id): Path<u32>) -> Html<String> {
@@ -149,24 +169,6 @@ async fn submit_contact(Form(form): Form<ContactForm>) -> Html<String> {
     Html(template.render().unwrap())
 }
 
-// Handler for residue class
-async fn residue_class(Path(m): Path<usize>) -> Html<String> {
-    let moduli = m;
-    let prime = math::is_prime(moduli);
-    let primes = math::get_primes(moduli);
-
-    let addition = math::remainder_table(moduli, |row, col| row + col);
-    let multiplication = math::remainder_table(moduli, |row, col| row * col);
-
-    let template = ResidueTableTemplate {
-        moduli: moduli,
-        is_prime: prime,
-        primes: primes,
-        addition,
-        multiplication,
-    };
-    Html(template.render().unwrap())
-}
 
 #[tokio::main]
 async fn main() {
@@ -176,6 +178,7 @@ async fn main() {
         .route("/euclidian_algorithm/:number/:number", get(euclidian_algorithm))
         .route("/integer_factorization/:number", get(integer_factorization))
         .route("/residue_class/:size", get(residue_class))
+
         .route("/detail/:id", get(detail))
         .route("/search", get(search))
         .route("/contact", get(contact_form).post(submit_contact));
