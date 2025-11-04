@@ -19,7 +19,7 @@ WORKDIR /workspace
 
 #
 # === Build Stage ===
-FROM rust:latest AS build
+FROM rust:trixie AS build
 
 WORKDIR /workspace
 COPY . .
@@ -27,7 +27,7 @@ RUN cargo build --release
 
 #
 # === Production Stage ===
-FROM debian:bullseye-slim AS prod
+FROM debian:trixie-slim AS prod
 
 # Install runtime dependencies (if needed)
 RUN apt-get update && \
