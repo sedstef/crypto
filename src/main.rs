@@ -33,8 +33,8 @@ struct EuclideanTemplate {
 #[derive(Template)]
 #[template(path = "factorization.html")]
 struct FactorizationTemplate {
-    number: u64,
-    factors: Vec<u64>,
+    number: usize,
+    factors: Vec<usize>,
 }
 
 #[derive(Template)]
@@ -114,7 +114,7 @@ async fn euclidian_algorithm(Path((a, b)): Path<(usize, usize)>) -> Html<String>
     Html(template.render().unwrap())
 }
 
-async fn integer_factorization(Path(number): Path<u64>) -> Html<String> {
+async fn integer_factorization(Path(number): Path<usize>) -> Html<String> {
     let template = FactorizationTemplate {
         number,
         factors: math::prime_factors(number),

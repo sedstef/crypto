@@ -1,5 +1,5 @@
 
-pub fn prime_factors(mut n: u64) -> Vec<u64> {
+pub fn prime_factors(mut n: usize) -> Vec<usize> {
     let mut factors = Vec::new();
     let mut divisor = 2;
 
