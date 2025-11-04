@@ -58,7 +58,7 @@ pub fn remainder_table(moduli: usize, function: fn(usize, usize) -> usize) -> Ve
     data
 }
 
-pub fn get_gcd(mut a: usize, mut b: usize, rows: &mut Vec<EuclideanRow> ) -> usize {
+pub fn gcd(mut a: usize, mut b: usize, rows: &mut Vec<EuclideanRow> ) -> usize {
     while b != 0 {
         let quotient = a / b;
         let remainder = a % b;
@@ -108,7 +108,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_gcd() {
+    fn test_gcd() {
         //arrange + act
         let expected_gcd = 6;
         let expected_rows: Vec<EuclideanRow> = vec![
@@ -117,7 +117,7 @@ mod tests {
         ];
 
         let mut rows: Vec<EuclideanRow> =  Vec::new();
-        let gcd = get_gcd(54, 24, &mut rows);
+        let gcd = gcd(54, 24, &mut rows);
 
         //assert
         assert_eq!(gcd, expected_gcd, "Got wrong gcd {}", gcd);

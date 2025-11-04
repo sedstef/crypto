@@ -1,3 +1,5 @@
+mod math;
+
 use axum::{
     extract::{Path, Query},
     http::{HeaderMap, HeaderValue, StatusCode},
@@ -8,9 +10,8 @@ use axum::{
 use askama::Template;
 use serde::Deserialize;
 use std::net::SocketAddr;
-use crate::math::{get_gcd, EuclideanRow};
+use math::{EuclideanRow};
 
-mod math;
 
 // Templates mit Askama
 #[derive(Template)]
@@ -90,7 +91,7 @@ async fn index() -> Html<String> {
 
 async fn euclidian_algorithm(Path((a, b)): Path<(usize, usize)>) -> Html<String> {
     let mut rows: Vec<EuclideanRow> =  Vec::new();
-    let gcd = get_gcd(a, b, &mut rows);
+    let gcd = math::gcd(a, b, &mut rows);
     let template = EuclideanTemplate {
         a: a,
         b: b,
