@@ -77,6 +77,7 @@ pub fn get_gcd(mut a: usize, mut b: usize, rows: &mut Vec<EuclideanRow> ) -> usi
     a
 }
 
+#[derive(Debug, PartialEq)]
 pub struct EuclideanRow {
     pub a: usize,
     pub b: usize,
@@ -108,11 +109,18 @@ mod tests {
 
     #[test]
     fn test_get_gcd() {
+        //arrange + act
+        let expected_gcd = 6;
+        let expected_rows: Vec<EuclideanRow> = vec![
+            EuclideanRow{a: 54, b: 24, quotient: 2, remainder: 6},
+            EuclideanRow{a: 24, b: 6, quotient: 4, remainder: 0}
+        ];
+
         let mut rows: Vec<EuclideanRow> =  Vec::new();
         let gcd = get_gcd(54, 24, &mut rows);
-        assert_eq!(gcd, 6, "Failed on input ({})", gcd);
-        for row in rows{
-            println!("{} = {} * {} + {}", row.a, row.b, row.quotient, row.remainder);
-        }
+
+        //assert
+        assert_eq!(gcd, expected_gcd, "Got wrong gcd {}", gcd);
+        assert_eq!(rows, expected_rows, "Got wrong rows");
     }
 }
