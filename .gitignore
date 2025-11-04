@@ -1,1 +1,6 @@
-/target
+## Cargo ##
+target/
+
+
+## Intellij IDEA ##
+.idea/
