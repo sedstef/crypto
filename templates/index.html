@@ -2,33 +2,35 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title }}</title>
+    <title>Tabellen Generator</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
-        .item { padding: 10px; margin: 10px 0; background: #f0f0f0; border-radius: 5px; }
-        a { color: #0066cc; text-decoration: none; }
-        nav { margin: 20px 0; padding: 10px; background: #e8e8e8; border-radius: 5px; }
+        .form-group { margin: 15px 0; }
+        label { display: inline-block; width: 100px; }
+        input { padding: 5px; }
+        button { padding: 10px 20px; background: #0066cc; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0052a3; }
     </style>
 </head>
 <body>
-<h1>{{ title }}</h1>
+<h1>Tabellen Generator</h1>
+<form action="/table" method="get">
+    <div class="form-group">
+        <label>Zeilen:</label>
+        <input type="number" name="rows" value="5" min="1" max="50">
+    </div>
+    <div class="form-group">
+        <label>Spalten:</label>
+        <input type="number" name="cols" value="5" min="1" max="20">
+    </div>
+    <button type="submit">Tabelle erstellen</button>
+</form>
 
-<nav>
-    <a href="/">Home</a> |
-    <a href="/contact">Kontakt</a> |
-    <a href="/search?q=rust">Suche</a>
-</nav>
-
-<h2>Artikel:</h2>
-{% for item in items %}
-<div class="item">{{ item }}</div>
-{% endfor %}
-
-<h2>Details:</h2>
+<h2>Beispiele:</h2>
 <ul>
-    <li><a href="/detail/1">Artikel 1 anzeigen</a></li>
-    <li><a href="/detail/2">Artikel 2 anzeigen</a></li>
-    <li><a href="/detail/3">Artikel 3 anzeigen</a></li>
+    <li><a href="/table?rows=3&cols=4">3x4 Tabelle</a></li>
+    <li><a href="/table?rows=10&cols=6">10x6 Tabelle</a></li>
+    <li><a href="/table?rows=8&cols=8">8x8 Tabelle (Schachbrett)</a></li>
 </ul>
 </body>
 </html>

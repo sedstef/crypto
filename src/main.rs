@@ -42,6 +42,23 @@ struct SearchQuery {
     q: Option<String>,
 }
 
+// Template für Tabelle
+#[derive(Template)]
+#[template(path = "table.html")]
+struct TableTemplate {
+    rows: usize,
+    cols: usize,
+    data: Vec<Vec<String>>,
+}
+
+
+// Query Parameter für Tabellengröße
+#[derive(Deserialize)]
+struct TableQuery {
+    rows: Option<usize>,
+    cols: Option<usize>,
+}
+
 // Handler
 async fn index() -> Html<String> {
     let template = IndexTemplate {
@@ -97,11 +114,54 @@ async fn submit_contact(Form(form): Form<ContactForm>) -> Html<String> {
     Html(template.render().unwrap())
 }
 
+// Handler für Tabelle
+async fn create_table(Query(params): Query<TableQuery>) -> Html<String> {
+    let rows = params.rows.unwrap_or(5).min(50);
+    let cols = params.cols.unwrap_or(5).min(20);
+
+    // Generiere Beispieldaten
+    let mut data = Vec::new();
+    for row in 0..rows {
+        let mut row_data = Vec::new();
+        for col in 0..cols {
+            row_data.push(format!("R{}C{}", row + 1, col + 1));
+        }
+        data.push(row_data);
+    }
+
+    let template = TableTemplate { rows, cols, data };
+    Html(template.render().unwrap())
+}
+
+// Handler for multiplication table
+async fn multiplication_table(Path(size): Path<usize>) -> Html<String> {
+    let size = size.min(20);
+    let mut data = Vec::new();
+
+    for row in 1..=size {
+        let mut row_data = Vec::new();
+        for col in 1..=size {
+            row_data.push(format!("{}", row * col));
+        }
+        data.push(row_data);
+    }
+
+    let template = TableTemplate {
+        rows: size,
+        cols: size,
+        data,
+    };
+    Html(template.render().unwrap())
+}
+
+
 #[tokio::main]
 async fn main() {
     // Router mit verschiedenen Routes
     let app = Router::new()
         .route("/", get(index))
+        .route("/table", get(create_table))
+        .route("/multiplication/:size", get(multiplication_table))
         .route("/detail/:id", get(detail))
         .route("/search", get(search))
         .route("/contact", get(contact_form).post(submit_contact));
