@@ -17,6 +17,13 @@ struct IndexTemplate {
 }
 
 #[derive(Template)]
+#[template(path = "factorization.html")]
+struct FactorizationTemplate {
+    number: u64,
+    factors: Vec<(u64, u32)>,
+}
+
+#[derive(Template)]
 #[template(path = "detail.html")]
 struct DetailTemplate {
     id: u32,
@@ -81,6 +88,55 @@ async fn index() -> Html<String> {
     };
     Html(template.render().unwrap())
 }
+
+async fn integer_factorization(Path(number): Path<u64>) -> Html<String> {
+    let template = FactorizationTemplate{
+        number,
+        factors:prime_factors(number)
+    };
+    Html(template.render().unwrap())
+}
+
+// --- Prime factorization (trial division) ---
+fn prime_factors(mut n: u64) -> Vec<(u64, u32)> {
+    let mut res = Vec::new();
+    if n < 2 {
+        return res;
+    }
+
+
+    if n % 2 == 0 {
+        let mut count = 0;
+        while n % 2 == 0 {
+            n /= 2;
+            count += 1;
+        }
+        res.push((2, count));
+    }
+
+
+    let mut p = 3u64;
+    while p.checked_mul(p).map_or(false, |pp| pp <= n) {
+        if n % p == 0 {
+            let mut count = 0u32;
+            while n % p == 0 {
+                n /= p;
+                count += 1;
+            }
+            res.push((p, count));
+        }
+        p += 2;
+    }
+
+
+    if n > 1 {
+        res.push((n, 1));
+    }
+
+
+    res
+}
+
 
 async fn detail(Path(id): Path<u32>) -> Html<String> {
     let template = DetailTemplate {
@@ -222,6 +278,7 @@ async fn main() {
     // Router mit verschiedenen Routes
     let app = Router::new()
         .route("/", get(index))
+        .route("/integer_factorization/:number", get(integer_factorization))
         .route("/table", get(create_table))
         .route("/residue_class/:size", get(residue_class))
         .route("/multiplication/:size", get(multiplication_table))

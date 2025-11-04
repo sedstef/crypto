@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ number }}</title>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+<body>
+<h1>{{ number }}</h1>
+
+<div>
+    $$
+{{ number }} =
+{% for (i, factor) in factors.iter().enumerate() %}
+    {{ factor.0 }} * {{ factor.1 }}
+    {% if i + 1 < factors.len() %} + {% endif %}
+{% endfor %}
+    $$
+</div>
+
+<table>
+{% for factor in factors %}
+    <tr>
+        <td>{{ factor.0 }}</td>
+        <td>{{ factor.1 }}</td>
+    </tr>
+{% endfor %}
+</table>
+
+
+<a href="/">← Zurück zur Übersicht</a>
+</body>
+</html>
