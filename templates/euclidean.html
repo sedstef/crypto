@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ gcd }}</title>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+    <h1>Euclidean Algorithm of {{ a }} {{ b }}</h1>
+
+    <div>
+        $$
+        gcd({{a}},{{b}}) = {{gcd}}
+        $$
+    </div>
+
+    <table border="1">
+        <thead>
+            <td>a</td>
+            <td>b</td>
+            <td>q</td>
+            <td>r</td>
+        </thead>
+        {% for euclidianRow in euclidean_rows %}
+        <tr>
+            <td>{{ euclidianRow.a }}</td>
+            <td>{{ euclidianRow.b }}</td>
+            <td>{{ euclidianRow.quotient }}</td>
+            <td>{{ euclidianRow.remainder }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="4">gcd({{a}},{{b}}) = {{gcd}}</td>
+        </tr>
+    </table>
+
+
+    <a href="/">← Back to Index</a>
+</body>
+
+</html>

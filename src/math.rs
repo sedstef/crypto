@@ -1,4 +1,3 @@
-use crate::math;
 
 pub fn prime_factors(mut n: u64) -> Vec<u64> {
     let mut factors = Vec::new();
@@ -59,6 +58,33 @@ pub fn remainder_table(moduli: usize, function: fn(usize, usize) -> usize) -> Ve
     data
 }
 
+pub fn get_gcd(mut a: usize, mut b: usize, rows: &mut Vec<EuclideanRow> ) -> usize {
+    while b != 0 {
+        let quotient = a / b;
+        let remainder = a % b;
+
+        rows.push(EuclideanRow {
+            a,
+            b,
+            quotient,
+            remainder,
+        });
+
+        // advance the algorithm
+        a = b;
+        b = remainder;
+    }
+    a
+}
+
+pub struct EuclideanRow {
+    pub a: usize,
+    pub b: usize,
+    pub quotient: usize,
+    pub remainder: usize,
+}
+
+
 #[cfg(test)]
 mod tests {
     // bring outer symbols into scope
@@ -77,6 +103,16 @@ mod tests {
 
         for (value, expected) in cases {
             assert_eq!(is_prime(value), expected, "Failed on input ({})", value);
+        }
+    }
+
+    #[test]
+    fn test_get_gcd() {
+        let mut rows: Vec<EuclideanRow> =  Vec::new();
+        let gcd = get_gcd(54, 24, &mut rows);
+        assert_eq!(gcd, 6, "Failed on input ({})", gcd);
+        for row in rows{
+            println!("{} = {} * {} + {}", row.a, row.b, row.quotient, row.remainder);
         }
     }
 }

@@ -8,6 +8,7 @@ use axum::{
 use askama::Template;
 use serde::Deserialize;
 use std::net::SocketAddr;
+use crate::math::{get_gcd, EuclideanRow};
 
 mod math;
 
@@ -17,6 +18,16 @@ mod math;
 struct IndexTemplate {
     title: String,
     items: Vec<String>,
+}
+
+
+#[derive(Template)]
+#[template(path = "euclidean.html")]
+struct EuclideanTemplate {
+    a: usize,
+    b: usize,
+    gcd: usize,
+    euclidean_rows: Vec<EuclideanRow>,
 }
 
 #[derive(Template)]
@@ -87,6 +98,18 @@ async fn index() -> Html<String> {
             "Item 2".to_string(),
             "Item 3".to_string(),
         ],
+    };
+    Html(template.render().unwrap())
+}
+
+async fn euclidian_algorithm(Path((a, b)): Path<(usize, usize)>) -> Html<String> {
+    let mut rows: Vec<EuclideanRow> =  Vec::new();
+    let gcd = get_gcd(a, b, &mut rows);
+    let template = EuclideanTemplate {
+        a: a,
+        b: b,
+        gcd: gcd,
+        euclidean_rows: rows,
     };
     Html(template.render().unwrap())
 }
@@ -205,6 +228,7 @@ async fn main() {
     // Router mit verschiedenen Routes
     let app = Router::new()
         .route("/", get(index))
+        .route("/euclidian_algorithm/:number/:number", get(euclidian_algorithm))
         .route("/integer_factorization/:number", get(integer_factorization))
         .route("/table", get(create_table))
         .route("/residue_class/:size", get(residue_class))
