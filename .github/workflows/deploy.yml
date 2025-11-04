@@ -1,4 +1,4 @@
-name: Deploy and publish
+name: Deploy and Publish
 
 on:
   #run only on push on main
