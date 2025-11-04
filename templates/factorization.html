@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ number }}</title>
@@ -16,29 +17,48 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 </head>
+
 <body>
-<h1>{{ number }}</h1>
+    <h1>Integer Factorization for {{ number }}</h1>
 
-<div>
-    $$
-{{ number }} =
-{% for (i, factor) in factors.iter().enumerate() %}
-    {{ factor.0 }} * {{ factor.1 }}
-    {% if i + 1 < factors.len() %} + {% endif %}
-{% endfor %}
-    $$
-</div>
+    <!--
+    <form id="dynamicForm" onsubmit="updateAction()" method="get">
+        <label for="number">Enter an integer:</label>
+        <input type="number" id="number" name="value" required value="{{ number }}">
+        <button type="submit">Go</button>
+    </form>
 
-<table>
-{% for factor in factors %}
-    <tr>
-        <td>{{ factor.0 }}</td>
-        <td>{{ factor.1 }}</td>
-    </tr>
-{% endfor %}
-</table>
+    <script>
+        function updateAction() {
+            const number = document.getElementById("number").value;
+            const form = document.getElementById("dynamicForm");
+            form.action = `/integer_factorization/${number}`;
+        }
+    </script>
+    -->
+
+    <div>
+        $$
+        {{ number }} =
+        {% for (i, factor) in factors.iter().enumerate() %}
+            {{ factor }} 
+            {% if i + 1 < factors.len() %} * {% endif %} 
+        {% endfor %} $$ 
+    </div>
+
+    <table>
+        <thead>
+            <td>Factors</td>
+        </thead>
+        {% for factor in factors %}
+        <tr>
+            <td>{{ factor }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 
 
-<a href="/">← Zurück zur Übersicht</a>
+    <a href="/">← Back to Index</a>
 </body>
+
 </html>

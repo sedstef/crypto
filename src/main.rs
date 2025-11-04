@@ -1,10 +1,11 @@
+use askama::Template;
 use axum::{
     extract::{Path, Query},
-    response::Html,
+    http::{HeaderMap, HeaderValue, StatusCode},
+    response::{Html, IntoResponse},
     routing::{get, post},
     Form, Router,
 };
-use askama::Template;
 use serde::Deserialize;
 use std::net::SocketAddr;
 
@@ -20,7 +21,7 @@ struct IndexTemplate {
 #[template(path = "factorization.html")]
 struct FactorizationTemplate {
     number: u64,
-    factors: Vec<(u64, u32)>,
+    factors: Vec<u64>,
 }
 
 #[derive(Template)]
@@ -68,7 +69,6 @@ struct TableTemplate {
     data: Vec<Vec<String>>,
 }
 
-
 // Query Parameter für Tabellengröße
 #[derive(Deserialize)]
 struct TableQuery {
@@ -90,51 +90,31 @@ async fn index() -> Html<String> {
 }
 
 async fn integer_factorization(Path(number): Path<u64>) -> Html<String> {
-    let template = FactorizationTemplate{
+    let template = FactorizationTemplate {
         number,
-        factors:prime_factors(number)
+        factors: prime_factors(number),
     };
     Html(template.render().unwrap())
 }
 
-// --- Prime factorization (trial division) ---
-fn prime_factors(mut n: u64) -> Vec<(u64, u32)> {
-    let mut res = Vec::new();
-    if n < 2 {
-        return res;
-    }
 
+fn prime_factors(mut n: u64) -> Vec<u64> {
+    let mut factors = Vec::new();
+    let mut divisor = 2;
 
-    if n % 2 == 0 {
-        let mut count = 0;
-        while n % 2 == 0 {
-            n /= 2;
-            count += 1;
+    while divisor * divisor <= n {
+        while n % divisor == 0 {
+            factors.push(divisor);
+            n /= divisor;
         }
-        res.push((2, count));
+        divisor += 1;
     }
-
-
-    let mut p = 3u64;
-    while p.checked_mul(p).map_or(false, |pp| pp <= n) {
-        if n % p == 0 {
-            let mut count = 0u32;
-            while n % p == 0 {
-                n /= p;
-                count += 1;
-            }
-            res.push((p, count));
-        }
-        p += 2;
-    }
-
 
     if n > 1 {
-        res.push((n, 1));
+        factors.push(n);
     }
 
-
-    res
+    factors
 }
 
 
@@ -205,7 +185,7 @@ async fn residue_class(Path(m): Path<usize>) -> Html<String> {
     let prime = is_prime(moduli);
     let mut primes = Vec::new();
     for number in 0..=moduli {
-        if is_prime(number){
+        if is_prime(number) {
             primes.push(number as usize);
         }
     }
@@ -223,7 +203,7 @@ async fn residue_class(Path(m): Path<usize>) -> Html<String> {
     Html(template.render().unwrap())
 }
 
-fn fill_table(moduli: usize, function: fn(usize,usize) -> usize) -> Vec<Vec<usize>> {
+fn fill_table(moduli: usize, function: fn(usize, usize) -> usize) -> Vec<Vec<usize>> {
     let mut data = Vec::new();
 
     for row in 0..=moduli {
