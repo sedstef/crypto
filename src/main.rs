@@ -8,6 +8,7 @@ use axum::{
 };
 use serde::Deserialize;
 use std::net::SocketAddr;
+mod math;
 
 // Templates mit Askama
 #[derive(Template)]
@@ -95,26 +96,6 @@ async fn integer_factorization(Path(number): Path<u64>) -> Html<String> {
         factors: prime_factors(number),
     };
     Html(template.render().unwrap())
-}
-
-
-fn prime_factors(mut n: u64) -> Vec<u64> {
-    let mut factors = Vec::new();
-    let mut divisor = 2;
-
-    while divisor * divisor <= n {
-        while n % divisor == 0 {
-            factors.push(divisor);
-            n /= divisor;
-        }
-        divisor += 1;
-    }
-
-    if n > 1 {
-        factors.push(n);
-    }
-
-    factors
 }
 
 
