@@ -53,3 +53,25 @@ pub fn is_prime(num: usize) -> bool {
 
     true // If num is not divisible by any number other than 1 and itself, it's prime
 }
+
+#[cfg(test)]
+mod tests {
+    // bring outer symbols into scope
+    use super::*;
+
+    #[test]
+    fn test_is_prime() {
+        let cases = [
+            (1, false),
+            (2, true),
+            (3, true),
+            (5, true),
+            (7, true),
+            (29, true),
+        ];
+
+        for (value, expected) in cases {
+            assert_eq!(is_prime(value), expected, "Failed on input ({})", value);
+        }
+    }
+}
