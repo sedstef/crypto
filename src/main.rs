@@ -167,8 +167,8 @@ async fn residue_class(Path(m): Path<usize>) -> Html<String> {
     let prime = math::is_prime(moduli);
     let primes = math::get_primes(moduli);
 
-    let addition = fill_table(moduli, |row, col| row + col);
-    let multiplication = fill_table(moduli, |row, col| row * col);
+    let addition = math::remainder_table(moduli, |row, col| row + col);
+    let multiplication = math::remainder_table(moduli, |row, col| row * col);
 
     let template = ResidueTableTemplate {
         moduli: moduli,
@@ -178,20 +178,6 @@ async fn residue_class(Path(m): Path<usize>) -> Html<String> {
         multiplication,
     };
     Html(template.render().unwrap())
-}
-
-fn fill_table(moduli: usize, function: fn(usize, usize) -> usize) -> Vec<Vec<usize>> {
-    let mut data = Vec::new();
-
-    for row in 0..=moduli {
-        let mut row_data = Vec::new();
-        for col in 0..=moduli {
-            let value = function(row, col).rem_euclid(moduli);
-            row_data.push(value);
-        }
-        data.push(row_data);
-    }
-    data
 }
 
 async fn multiplication_table(Path(size): Path<usize>) -> Html<String> {

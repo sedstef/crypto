@@ -45,6 +45,20 @@ pub fn is_prime(num: usize) -> bool {
     true // If num is not divisible by any number other than 1 and itself, it's prime
 }
 
+pub fn remainder_table(moduli: usize, function: fn(usize, usize) -> usize) -> Vec<Vec<usize>> {
+    let mut data = Vec::new();
+
+    for row in 0..=moduli {
+        let mut row_data = Vec::new();
+        for col in 0..=moduli {
+            let value = function(row, col).rem_euclid(moduli);
+            row_data.push(value);
+        }
+        data.push(row_data);
+    }
+    data
+}
+
 #[cfg(test)]
 mod tests {
     // bring outer symbols into scope
