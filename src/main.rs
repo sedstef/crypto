@@ -1,4 +1,3 @@
-use askama::Template;
 use axum::{
     extract::{Path, Query},
     http::{HeaderMap, HeaderValue, StatusCode},
@@ -6,8 +5,10 @@ use axum::{
     routing::{get, post},
     Form, Router,
 };
+use askama::Template;
 use serde::Deserialize;
 use std::net::SocketAddr;
+
 mod math;
 
 // Templates mit Askama
@@ -93,7 +94,7 @@ async fn index() -> Html<String> {
 async fn integer_factorization(Path(number): Path<u64>) -> Html<String> {
     let template = FactorizationTemplate {
         number,
-        factors: prime_factors(number),
+        factors: math::prime_factors(number),
     };
     Html(template.render().unwrap())
 }
@@ -163,13 +164,8 @@ async fn create_table(Query(params): Query<TableQuery>) -> Html<String> {
 // Handler for residue class
 async fn residue_class(Path(m): Path<usize>) -> Html<String> {
     let moduli = m;
-    let prime = is_prime(moduli);
-    let mut primes = Vec::new();
-    for number in 0..=moduli {
-        if is_prime(number) {
-            primes.push(number as usize);
-        }
-    }
+    let prime = math::is_prime(moduli);
+    let primes = math::get_primes(moduli);
 
     let addition = fill_table(moduli, |row, col| row + col);
     let multiplication = fill_table(moduli, |row, col| row * col);
@@ -216,22 +212,6 @@ async fn multiplication_table(Path(size): Path<usize>) -> Html<String> {
         data,
     };
     Html(template.render().unwrap())
-}
-
-// Define a function named 'is_prime' that takes a number as parameter and returns true if it's prime, false otherwise
-fn is_prime(num: usize) -> bool {
-    if num <= 1 {
-        return false; // Numbers less than or equal to 1 are not prime
-    }
-
-    // Check if num is divisible by any number from 2 to the square root of num
-    for i in 2..=(num as f64).sqrt() as usize {
-        if num % i == 0 {
-            return false; // If num is divisible by any number other than 1 and itself, it's not prime
-        }
-    }
-
-    true // If num is not divisible by any number other than 1 and itself, it's prime
 }
 
 #[tokio::main]
