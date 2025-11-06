@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Euclidean Algorithm - Worstcase till {{upper_range}}</title>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+    <h1>Euclidean Algorithm Worstcase till {{upper_range}}</h1>
+
+    <div>
+        gcd({{best_pair.0}},{{best_pair.1}}) has {{max_steps}} steps.
+    </div>
+
+    <a href="euclidean/{{best_pair.0}}/{{best_pair.1}}">See details for gcd({{best_pair.0}},{{best_pair.1}})</a>
+
+    <a href="/">← Back to Index</a>
+</body>
+
+</html>

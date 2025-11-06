@@ -21,7 +21,6 @@ struct IndexTemplate {
     items: Vec<String>,
 }
 
-
 #[derive(Template)]
 #[template(path = "euclidean.html")]
 struct EuclideanTemplate {
@@ -29,6 +28,14 @@ struct EuclideanTemplate {
     b: usize,
     gcd: usize,
     euclidean_rows: Vec<EuclideanRow>,
+}
+
+#[derive(Template)]
+#[template(path = "euclidean_wc.html")]
+struct EuclideanWortsCaseTemplate {
+    upper_range: usize,
+    best_pair: (usize,usize),
+    max_steps: usize,
 }
 
 #[derive(Template)]
@@ -97,6 +104,28 @@ async fn euclidian_algorithm(Path((a, b)): Path<(usize, usize)>) -> Html<String>
         b: b,
         gcd: gcd,
         euclidean_rows: rows,
+    };
+    Html(template.render().unwrap())
+}
+
+async fn euclidian_algorithm_worst_case(Path((upper)): Path<usize>) -> Html<String> {
+    let mut max_steps = 0;
+    let mut best_pair = (0, 0);
+
+    for i in 1..upper {
+        for j in 1..i {
+            let mut rows: Vec<EuclideanRow> =  Vec::new();
+            let gcd = math::gcd(i, j, &mut rows);
+            if rows.len() > max_steps {
+                max_steps = rows.len();
+                best_pair = (i, j);
+            }
+        }
+    }
+    let template = EuclideanWortsCaseTemplate {
+        upper_range: upper,
+        best_pair: best_pair,
+        max_steps: max_steps
     };
     Html(template.render().unwrap())
 }
@@ -177,6 +206,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(index))
         .route("/euclidian_algorithm/:number/:number", get(euclidian_algorithm))
+        .route("/euclidian_algorithm_worst_case/:number", get(euclidian_algorithm_worst_case))
         .route("/integer_factorization/:number", get(integer_factorization))
         .route("/residue_class/:size", get(residue_class))
 
