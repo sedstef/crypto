@@ -10,6 +10,7 @@ use axum::{
 use askama::Template;
 use serde::Deserialize;
 use std::net::SocketAddr;
+use std::time::Instant;
 use math::{EuclideanRow};
 
 
@@ -36,6 +37,7 @@ struct EuclideanWortsCaseTemplate {
     upper_range: usize,
     best_pair: (usize,usize),
     max_steps: usize,
+    duration_ms: u128,
 }
 
 #[derive(Template)]
@@ -112,20 +114,26 @@ async fn euclidian_algorithm_worst_case(Path((upper)): Path<usize>) -> Html<Stri
     let mut max_steps = 0;
     let mut best_pair = (0, 0);
 
+    let start = Instant::now();
+
     for i in 1..upper {
         for j in 1..i {
             let mut rows: Vec<EuclideanRow> =  Vec::new();
-            let gcd = math::gcd(i, j, &mut rows);
+            let _gcd = math::gcd(i, j, &mut rows);
             if rows.len() > max_steps {
                 max_steps = rows.len();
                 best_pair = (i, j);
             }
         }
     }
+
+    let duration = start.elapsed().as_millis();
+
     let template = EuclideanWortsCaseTemplate {
         upper_range: upper,
         best_pair: best_pair,
-        max_steps: max_steps
+        max_steps: max_steps,
+        duration_ms: duration,
     };
     Html(template.render().unwrap())
 }
