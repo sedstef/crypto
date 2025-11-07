@@ -26,7 +26,27 @@
         Calculation took {{duration_ms}} ms.
     </div>
 
-    <a href="euclidean/{{best_pair.0}}/{{best_pair.1}}">See details for gcd({{best_pair.0}},{{best_pair.1}})</a>
+    <a href="/euclidian_algorithm/{{best_pair.0}}/{{best_pair.1}}">See details for gcd({{best_pair.0}},{{best_pair.1}})</a>
+
+    <table border="1">
+        <thead>
+        <tr><td>steps</td><td>count of pairs</td><td>first pair</td></tr>
+        </thead>
+        <tbody>
+        {% for (step_count, count, a, b) in steps %}
+        <tr>
+            <td>{{ step_count }}</td>
+            <td>{{ count }}</td>
+            <td>
+                <a href="/euclidian_algorithm/{{ a }}/{{ b }}">
+                    See details for gcd({{ a }},{{ b }})
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
 
     <a href="/">← Back to Index</a>
 </body>

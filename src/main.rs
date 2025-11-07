@@ -1,5 +1,6 @@
 mod math;
 
+use std::collections::HashMap;
 use axum::{
     extract::{Path, Query},
     http::{HeaderMap, HeaderValue, StatusCode},
@@ -38,6 +39,7 @@ struct EuclideanWortsCaseTemplate {
     best_pair: (usize,usize),
     max_steps: usize,
     duration_ms: u128,
+    steps: Vec<(usize, usize, usize, usize)>
 }
 
 #[derive(Template)]
@@ -111,15 +113,20 @@ async fn euclidian_algorithm(Path((a, b)): Path<(usize, usize)>) -> Html<String>
 }
 
 async fn euclidian_algorithm_worst_case(Path((upper)): Path<usize>) -> Html<String> {
+    let start = Instant::now();
+
+    let mut step_counts: HashMap<usize,usize> = HashMap::new();
+    let mut step_example: HashMap<usize,(usize,usize)> = HashMap::new();
     let mut max_steps = 0;
     let mut best_pair = (0, 0);
 
-    let start = Instant::now();
 
     for i in 1..upper {
         for j in 1..i {
-            let mut rows: Vec<EuclideanRow> =  Vec::new();
+            let mut rows: Vec<EuclideanRow> = Vec::new();
             let _gcd = math::gcd(i, j, &mut rows);
+            *step_counts.entry(rows.len()).or_insert(0) += 1;
+            let _ = *step_example.entry(rows.len()).or_insert((i,j));
             if rows.len() > max_steps {
                 max_steps = rows.len();
                 best_pair = (i, j);
@@ -129,11 +136,26 @@ async fn euclidian_algorithm_worst_case(Path((upper)): Path<usize>) -> Html<Stri
 
     let duration = start.elapsed().as_millis();
 
+    //ordering the steps by number of steps is not part of the duration measurement
+    let mut steps: Vec<(usize, usize, usize, usize)> = step_counts
+        .into_iter()
+        .map(|(k, v)| {
+            // remove the example from the map if available; fallback to (0,0) if not
+            let (a, b) = step_example.remove(&k).unwrap_or((0usize, 0usize));
+            (k, v, a, b)
+        })
+        .collect();
+
+    // sort by the step_count (first tuple field)
+    steps.sort_by_key(|(k, _, _, _)| *k);
+
+
     let template = EuclideanWortsCaseTemplate {
         upper_range: upper,
         best_pair: best_pair,
         max_steps: max_steps,
         duration_ms: duration,
+        steps: steps
     };
     Html(template.render().unwrap())
 }
